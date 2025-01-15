@@ -6,9 +6,9 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ScheduledJob implements Job{
+public class ScheduledTask implements Job{
 
-    public static final Logger logger = LoggerFactory.getLogger(ScheduledJob.class); //org.slfj4
+    public static final Logger logger = LoggerFactory.getLogger(ScheduledTask.class); //org.slfj4
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
