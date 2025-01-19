@@ -10,6 +10,7 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
+import org.quartz.TriggerKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,7 @@ public class JobService {
     @Autowired
     private Scheduler scheduler;
 
+    //To schedule job
     public void scheduleJob(ScheduledJob job) throws SchedulerException{
 
         ScheduledJob savedJob = scheduledJobRepository.save(job);
@@ -42,12 +44,54 @@ public class JobService {
         scheduler.scheduleJob(jobDetail, trigger);
     }
 
+    //to list all jobs
     public List<ScheduledJob> getAllJobs(){
         return scheduledJobRepository.findAll();
     }
 
+    //to delete a job
     public void deleteJob(String jobName , String jobGroup) throws SchedulerException{
         scheduler.deleteJob(new JobKey(jobName, jobGroup));
         scheduledJobRepository.deleteByJobNameAndJobGroup(jobName , jobGroup);
+    }
+
+    //to check if the job exists
+    // public boolean checkJobExist(String jobName , String jobGroup){
+    //     try{
+    //         JobKey jobKey = new JobKey(jobName,jobGroup);
+    //         return scheduler.checkExists(jobKey);
+    //     }catch(SchedulerException e){
+    //         e.printStackTrace();
+    //         return false;
+    //     }
+    // } 
+    //maybe not needed
+
+    //to update a job
+    public void updateJobSchedule(ScheduledJob job)throws SchedulerException{
+        JobKey jobKey=new JobKey(job.getJobName(),job.getJobGroup());
+
+        if(!scheduler.checkExists(jobKey)){
+            throw new SchedulerException("Job with name "+job.getJobName()+" and group "+job.getJobGroup()+" does not exist");
+        }
+        //get the current job detail
+        JobDetail jobDetail = scheduler.getJobDetail(jobKey);
+
+        //build new trigger with updated cronExpression
+        Trigger newTrigger = TriggerBuilder.newTrigger()
+        .withIdentity(job.getJobName(),job.getJobGroup())
+        .withSchedule(CronScheduleBuilder.cronSchedule(job.getCronExpression()))
+        .build();
+
+        //update the quartz schedule
+        scheduler.rescheduleJob(new TriggerKey(job.getJobName(), job.getJobGroup()), newTrigger);
+
+        //update in database
+        ScheduledJob existingJob = scheduledJobRepository
+        .findByJobNameAndJobGroup(job.getJobName(), job.getJobGroup())
+        .orElseThrow(()-> new SchedulerException("job not found with name "+job.getJobName()+" and group "+job.getJobGroup()));
+
+        existingJob.setCronExpression(job.getCronExpression());
+        scheduledJobRepository.save(existingJob);
     }
 }
