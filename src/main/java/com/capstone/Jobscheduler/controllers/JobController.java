@@ -5,7 +5,6 @@ import java.util.List;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -64,6 +63,27 @@ public class JobController {
             return ResponseEntity.ok("job updated successfully!");
         }catch(SchedulerException e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating job schedule: "+e.getMessage());
+        }
+    }
+
+    //to trigger existing job manually
+    @PostMapping("/trigger")
+    public ResponseEntity<String> triggerJob(@RequestParam String jobName , @RequestParam String jobGroup){
+        try{
+            jobService.triggerJob(jobName, jobGroup);
+            return ResponseEntity.ok("Job triggered succesfully");
+        }catch(SchedulerException e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error triggering job: "+e.getMessage());
+        }
+    }
+
+    @PostMapping("/pause")
+    public ResponseEntity<String> pauseJob(@RequestParam String jobName , @RequestParam String jobGroup){
+        try{
+            jobService.pauseJob(jobName, jobGroup);
+            return ResponseEntity.ok("Job paused successfully!");
+        }catch(SchedulerException e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error pausing job: "+e.getMessage());
         }
     }
 }

@@ -74,9 +74,6 @@ public class JobService {
         if(!scheduler.checkExists(jobKey)){
             throw new SchedulerException("Job with name "+job.getJobName()+" and group "+job.getJobGroup()+" does not exist");
         }
-        //get the current job detail
-        JobDetail jobDetail = scheduler.getJobDetail(jobKey);
-
         //build new trigger with updated cronExpression
         Trigger newTrigger = TriggerBuilder.newTrigger()
         .withIdentity(job.getJobName(),job.getJobGroup())
@@ -93,5 +90,27 @@ public class JobService {
 
         existingJob.setCronExpression(job.getCronExpression());
         scheduledJobRepository.save(existingJob);
+    }
+
+    //to trigger a existing job
+    public void triggerJob(String jobName , String jobGroup)throws SchedulerException{
+        JobKey jobKey = new JobKey(jobName,jobGroup);
+        if(!scheduler.checkExists(jobKey)){
+            throw new SchedulerException("job with name "+jobName+" and group "+jobGroup+" does not exist");
+        }
+
+        //trigger job manually
+        scheduler.triggerJob(jobKey);
+    }
+
+    //API to pause job
+    public void pauseJob(String jobName , String jobGroup)throws SchedulerException{
+        JobKey jobKey = new JobKey(jobName, jobGroup);
+
+        if(scheduler.checkExists(jobKey)){
+            scheduler.pauseJob(jobKey);
+        }else{
+            throw new SchedulerException("Job with name "+jobName+" and group "+jobGroup+" not found");
+        }
     }
 }

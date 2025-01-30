@@ -21,7 +21,7 @@ public class ScheduledJob {
     private Long id;
     private String jobName;
     private String jobGroup;
-    private String cronExpression;
+    private String cronExpression;  
     private String jobStatus;   // e.g., ACTIVE, PAUSED
 
 }
