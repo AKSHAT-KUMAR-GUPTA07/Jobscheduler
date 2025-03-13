@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Job Scheduler</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Job Scheduler</h1>
+        <a th:href="@{/jobs/schedule}" class="btn btn-primary mb-3">Schedule New Job</a>
+
+        <!-- Display success/error messages -->
+        <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <!-- Jobs List -->
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Job Name</th>
+                    <th>Job Group</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="job : ${jobs}">
+                    <td th:text="${job.jobName}"></td>
+                    <td th:text="${job.jobGroup}"></td>
+                    <td>
+                        <form th:action="@{/jobs/pause}" method="post" style="display:inline;">
+                            <input type="hidden" name="jobName" th:value="${job.jobName}">
+                            <input type="hidden" name="jobGroup" th:value="${job.jobGroup}">
+                            <button type="submit" class="btn btn-warning btn-sm">Pause</button>
+                        </form>
+                        <form th:action="@{/jobs/resume}" method="post" style="display:inline;">
+                            <input type="hidden" name="jobName" th:value="${job.jobName}">
+                            <input type="hidden" name="jobGroup" th:value="${job.jobGroup}">
+                            <button type="submit" class="btn btn-success btn-sm">Resume</button>
+                        </form>
+                        <form th:action="@{/jobs/delete}" method="post" style="display:inline;">
+                            <input type="hidden" name="jobName" th:value="${job.jobName}">
+                            <input type="hidden" name="jobGroup" th:value="${job.jobGroup}">
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

@@ -18,6 +18,8 @@ import com.capstone.Jobscheduler.entities.ScheduledJob;
 import com.capstone.Jobscheduler.repositories.ScheduledJobRepository;
 import com.capstone.Jobscheduler.scheduler.ScheduledTask;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class JobService {
 
@@ -50,6 +52,7 @@ public class JobService {
     }
 
     //to delete a job
+    @Transactional
     public void deleteJob(String jobName , String jobGroup) throws SchedulerException{
         scheduler.deleteJob(new JobKey(jobName, jobGroup));
         scheduledJobRepository.deleteByJobNameAndJobGroup(jobName , jobGroup);
@@ -92,16 +95,6 @@ public class JobService {
         scheduledJobRepository.save(existingJob);
     }
 
-    //to trigger a existing job
-    public void triggerJob(String jobName , String jobGroup)throws SchedulerException{
-        JobKey jobKey = new JobKey(jobName,jobGroup);
-        if(!scheduler.checkExists(jobKey)){
-            throw new SchedulerException("job with name "+jobName+" and group "+jobGroup+" does not exist");
-        }
-
-        //trigger job manually
-        scheduler.triggerJob(jobKey);
-    }
 
     //API to pause job
     public void pauseJob(String jobName , String jobGroup)throws SchedulerException{
@@ -109,6 +102,16 @@ public class JobService {
 
         if(scheduler.checkExists(jobKey)){
             scheduler.pauseJob(jobKey);
+        }else{
+            throw new SchedulerException("Job with name "+jobName+" and group "+jobGroup+" not found");
+        }
+    }
+
+    public void resumeJob(String jobName , String jobGroup)throws SchedulerException{
+        JobKey jobKey = new JobKey(jobName, jobGroup);
+
+        if(scheduler.checkExists(jobKey)){
+            scheduler.resumeJob(jobKey);
         }else{
             throw new SchedulerException("Job with name "+jobName+" and group "+jobGroup+" not found");
         }
