@@ -16,7 +16,6 @@ A robust **Job Scheduler Application** built with **Spring Boot 3**, integrating
 - **Distributed Scheduling**: Integrates with **Dkron** for distributed and fault-tolerant job scheduling.
 - **User-Friendly Interface**: Modern UI built with **Thymeleaf** and **Bootstrap 5**.
 - **Database Integration**: Uses **Spring Data JPA** and **Hibernate** to store job metadata in **MySQL**.
-- **Docker Support**: Easily deploy the application using Docker.
 - **RESTful API**: Exposes endpoints for job management.
 - **Responsive Design**: Works seamlessly on desktop and mobile devices.
 
